@@ -1,0 +1,64 @@
+==20799== Profiling application: ./MN
+==20799== Profiling result:
+            Type  Time(%)      Time     Calls       Avg       Min       Max  Name
+ GPU activities:   11.16%  8.4171ms       138  60.993us     640ns  2.5212ms  [CUDA memcpy HtoD]
+                    9.24%  6.9690ms         1  6.9690ms  6.9690ms  6.9690ms  executeEleventhLayer_PSC(double*, double*, double*, double*, double*, double*, double*)
+                    6.45%  4.8635ms         1  4.8635ms  4.8635ms  4.8635ms  executeSeventeenthLayer_PSC(double*, double*, double*, double*, double*, double*, double*)
+                    6.45%  4.8620ms         1  4.8620ms  4.8620ms  4.8620ms  executeTwentyOneLayer_PSC(double*, double*, double*, double*, double*, double*, double*)
+                    6.42%  4.8385ms         1  4.8385ms  4.8385ms  4.8385ms  executeTwentyThreeLayer_PSC(double*, double*, double*, double*, double*, double*, double*)
+                    6.42%  4.8379ms         1  4.8379ms  4.8379ms  4.8379ms  executeNineteenthLayer_PSC(double*, double*, double*, double*, double*, double*, double*)
+                    6.41%  4.8300ms         1  4.8300ms  4.8300ms  4.8300ms  executeFifteenthLayer_PSC(double*, double*, double*, double*, double*, double*, double*)
+                    4.97%  3.7468ms         1  3.7468ms  3.7468ms  3.7468ms  executeTwentySevenLayer_PSC(double*, double*, double*, double*, double*, double*, double*)
+                    4.66%  3.5141ms         1  3.5141ms  3.5141ms  3.5141ms  executeNinthLayer_PSC(double*, double*, double*, double*, double*, double*, double*)
+                    4.39%  3.3095ms         1  3.3095ms  3.3095ms  3.3095ms  executeThirdLayer_PSC_partA(double*, double*, double*, double*, double*, double*, double*)
+                    3.45%  2.6007ms         1  2.6007ms  2.6007ms  2.6007ms  executeSeventhLayer_PSC_partA(double*, double*, double*, double*, double*, double*, double*)
+                    3.21%  2.4207ms         1  2.4207ms  2.4207ms  2.4207ms  executeThirteenthLayer_PSC(double*, double*, double*, double*, double*, double*, double*)
+                    2.62%  1.9783ms         1  1.9783ms  1.9783ms  1.9783ms  executeSeventhLayer_PSC_partB(double*, double*, double*, double*, double*, double*, double*)
+                    2.58%  1.9480ms         2  973.99us  3.2960us  1.9447ms  [CUDA memcpy DtoH]
+                    2.46%  1.8534ms         1  1.8534ms  1.8534ms  1.8534ms  executeTwentyFiveLayer_PSC(double*, double*, double*, double*, double*, double*, double*)
+                    2.13%  1.6063ms         1  1.6063ms  1.6063ms  1.6063ms  executeFirstLayer_CONV3D_partA(double*, double*, double*, double*, double*, double*, double*)
+                    2.04%  1.5363ms         1  1.5363ms  1.5363ms  1.5363ms  executeSeventhLayer_PSC_partC(double*, double*, double*, double*, double*, double*, double*)
+                    1.78%  1.3406ms         1  1.3406ms  1.3406ms  1.3406ms  executeFifthLayer_PSC_partA(double*, double*, double*, double*, double*, double*, double*)
+                    1.59%  1.1952ms         1  1.1952ms  1.1952ms  1.1952ms  executeSeventhLayer_PSC_partD(double*, double*, double*, double*, double*, double*, double*)
+                    1.49%  1.1271ms         1  1.1271ms  1.1271ms  1.1271ms  executeTwentyNineLayer_FullyConnected(double*, double*, double*, double*)
+                    1.33%  1.0050ms         1  1.0050ms  1.0050ms  1.0050ms  executeFifthLayer_PSC_partB(double*, double*, double*, double*, double*, double*, double*)
+                    1.07%  808.08us         1  808.08us  808.08us  808.08us  executeFifthLayer_PSC_partC(double*, double*, double*, double*, double*, double*, double*)
+                    0.80%  599.97us         1  599.97us  599.97us  599.97us  executeSecondLayer_DSC_partA(double*, double*, double*, double*, double*, double*, double*)
+                    0.78%  587.36us         1  587.36us  587.36us  587.36us  executeFifthLayer_PSC_partD(double*, double*, double*, double*, double*, double*, double*)
+                    0.61%  461.08us         1  461.08us  461.08us  461.08us  executeThirdLayer_PSC_partB(double*, double*, double*, double*, double*, double*, double*)
+                    0.53%  399.96us         1  399.96us  399.96us  399.96us  executeTenthLayer_DSC(double*, double*, double*, double*, double*, double*, double*)
+                    0.53%  399.64us         1  399.64us  399.64us  399.64us  executeThirdLayer_PSC_partC(double*, double*, double*, double*, double*, double*, double*)
+                    0.36%  272.24us         1  272.24us  272.24us  272.24us  executeSixthLayer_DSC_partA(double*, double*, double*, double*, double*, double*, double*)
+                    0.35%  261.04us         1  261.04us  261.04us  261.04us  executeFirstLayer_CONV3D_partB(double*, double*, double*, double*, double*, double*, double*)
+                    0.31%  236.37us         1  236.37us  236.37us  236.37us  executeEighthLayer_DSC(double*, double*, double*, double*, double*, double*, double*)
+                    0.29%  220.24us         1  220.24us  220.24us  220.24us  executeFirstLayer_CONV3D_partC(double*, double*, double*, double*, double*, double*, double*)
+                    0.29%  215.28us         1  215.28us  215.28us  215.28us  executeSixthLayer_DSC_partB(double*, double*, double*, double*, double*, double*, double*)
+                    0.26%  196.91us         1  196.91us  196.91us  196.91us  executeSixthLayer_DSC_partC(double*, double*, double*, double*, double*, double*, double*)
+                    0.24%  177.90us         1  177.90us  177.90us  177.90us  executeFourthLayer_DSC_partA(double*, double*, double*, double*, double*, double*, double*)
+                    0.22%  164.49us         1  164.49us  164.49us  164.49us  executeTwentyLayer_DSC(double*, double*, double*, double*, double*, double*, double*)
+                    0.22%  163.15us         1  163.15us  163.15us  163.15us  executeEighteenthLayer_DSC(double*, double*, double*, double*, double*, double*, double*)
+                    0.22%  163.11us         1  163.11us  163.11us  163.11us  executeTwentyTwoLayer_DSC(double*, double*, double*, double*, double*, double*, double*)
+                    0.22%  162.41us         1  162.41us  162.41us  162.41us  executeFourteenthLayer_DSC(double*, double*, double*, double*, double*, double*, double*)
+                    0.21%  161.77us         1  161.77us  161.77us  161.77us  executeSixteenthLayer_DSC(double*, double*, double*, double*, double*, double*, double*)
+                    0.19%  143.21us         1  143.21us  143.21us  143.21us  executeSixthLayer_DSC_partD(double*, double*, double*, double*, double*, double*, double*)
+                    0.17%  130.66us         1  130.66us  130.66us  130.66us  executeFourthLayer_DSC_partB(double*, double*, double*, double*, double*, double*, double*)
+                    0.16%  121.61us         1  121.61us  121.61us  121.61us  executeFourthLayer_DSC_partC(double*, double*, double*, double*, double*, double*, double*)
+                    0.13%  98.469us         1  98.469us  98.469us  98.469us  executeTwelfthLayer_DSC(double*, double*, double*, double*, double*, double*, double*)
+                    0.12%  92.933us         1  92.933us  92.933us  92.933us  executeSecondLayer_DSC_partB(double*, double*, double*, double*, double*, double*, double*)
+                    0.12%  91.654us         1  91.654us  91.654us  91.654us  executeFourthLayer_DSC_partD(double*, double*, double*, double*, double*, double*, double*)
+                    0.11%  80.069us         1  80.069us  80.069us  80.069us  executeSecondLayer_DSC_partC(double*, double*, double*, double*, double*, double*, double*)
+                    0.10%  76.164us         1  76.164us  76.164us  76.164us  executeTwentySixLayer_DSC(double*, double*, double*, double*, double*, double*, double*)
+                    0.08%  59.524us         1  59.524us  59.524us  59.524us  executeTwentyEightLayer_AvgPooling(double*, double*)
+                    0.07%  49.827us         1  49.827us  49.827us  49.827us  executeTwentyFourLayer_DSC(double*, double*, double*, double*, double*, double*, double*)
+      API calls:   70.59%  229.86ms       167  1.3764ms  3.4650us  212.96ms  cudaMalloc
+                   22.02%  71.689ms       167  429.27us  4.8450us  7.4141ms  cudaFree
+                    4.86%  15.819ms       140  112.99us  5.4720us  2.9517ms  cudaMemcpy
+                    1.91%  6.2148ms         4  1.5537ms  3.7810us  4.1513ms  cudaDeviceSynchronize
+                    0.28%  898.75us        47  19.122us  10.721us  43.330us  cudaLaunch
+                    0.24%  779.19us        94  8.2890us     458ns  339.51us  cuDeviceGetAttribute
+                    0.05%  163.54us         1  163.54us  163.54us  163.54us  cuDeviceTotalMem
+                    0.03%  86.763us         1  86.763us  86.763us  86.763us  cuDeviceGetName
+                    0.02%  80.111us       321     249ns     134ns  4.5400us  cudaSetupArgument
+                    0.01%  28.718us        47     611ns     301ns  2.2880us  cudaConfigureCall
+                    0.00%  5.1480us         3  1.7160us     463ns  3.6720us  cuDeviceGetCount
+                    0.00%  3.0500us         2  1.5250us     566ns  2.4840us  cuDeviceGet

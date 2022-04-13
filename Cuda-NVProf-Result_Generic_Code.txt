@@ -1,0 +1,24 @@
+==22742== Profiling application: ./MN
+==22742== Profiling result:
+            Type  Time(%)      Time     Calls       Avg       Min       Max  Name
+ GPU activities:   76.08%  59.958ms        21  2.8552ms  395.08us  8.1568ms  executeGenericFunctions_PSC(double*, double*, double*, int, int, int, int, int, int, int, int, int, int, int, int, int, int, double*, double*, double*, double*)
+                   10.73%  8.4592ms       138  61.298us     608ns  2.2458ms  [CUDA memcpy HtoD]
+                    4.84%  3.8140ms        21  181.62us  49.416us  614.34us  executeGenericFunctions_DSC(double*, double*, double*, int, int, int, int, int, int, int, int, int, int, int, int, int, double*, double*, double*, double*)
+                    4.18%  3.2937ms         2  1.6469ms  3.1040us  3.2906ms  [CUDA memcpy DtoH]
+                    2.05%  1.6187ms         1  1.6187ms  1.6187ms  1.6187ms  executeFirstLayer_CONV3D_partA(double*, double*, double*, double*, double*, double*, double*)
+                    1.43%  1.1282ms         1  1.1282ms  1.1282ms  1.1282ms  executeTwentyNineLayer_FullyConnected(double*, double*, double*, double*)
+                    0.33%  258.67us         1  258.67us  258.67us  258.67us  executeFirstLayer_CONV3D_partB(double*, double*, double*, double*, double*, double*, double*)
+                    0.28%  220.10us         1  220.10us  220.10us  220.10us  executeFirstLayer_CONV3D_partC(double*, double*, double*, double*, double*, double*, double*)
+                    0.08%  59.818us         1  59.818us  59.818us  59.818us  executeTwentyEightLayer_AvgPooling(double*, double*)
+      API calls:   72.28%  271.81ms       167  1.6276ms  3.6050us  252.18ms  cudaMalloc
+                   20.28%  76.252ms       167  456.60us  5.1520us  10.267ms  cudaFree
+                    4.94%  18.566ms       140  132.61us  5.3130us  4.9707ms  cudaMemcpy
+                    1.65%  6.1996ms         4  1.5499ms  4.0510us  4.1353ms  cudaDeviceSynchronize
+                    0.30%  1.1278ms        94  11.997us     522ns  498.56us  cuDeviceGetAttribute
+                    0.28%  1.0586ms        47  22.523us  10.636us  59.852us  cudaLaunch
+                    0.15%  565.80us         1  565.80us  565.80us  565.80us  cuDeviceGetName
+                    0.06%  221.66us         1  221.66us  221.66us  221.66us  cuDeviceTotalMem
+                    0.06%  212.11us       888     238ns     136ns  6.2490us  cudaSetupArgument
+                    0.01%  43.254us        47     920ns     284ns  11.121us  cudaConfigureCall
+                    0.00%  5.9780us         3  1.9920us     676ns  4.0980us  cuDeviceGetCount
+                    0.00%  3.1200us         2  1.5600us     705ns  2.4150us  cuDeviceGet
