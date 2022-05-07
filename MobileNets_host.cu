@@ -123,6 +123,12 @@
 #define TWENTYNINE_LAYER_OUTPUT_SIZE 1000
 #define TWENTYNINE_LAYER_WEIGHT_SIZE 1024 * 1000
 
+//Recording time for the 4 layers together
+double time1;
+double time2;
+double time3;
+double time4;
+
 // Function declarations
 void NeuralNetwork();
 void read_File(const char *weightFileName, double *Layer1_Weights_CPU);
@@ -428,6 +434,11 @@ int main()
     time = (stop.tv_sec - start.tv_sec) + (double)(stop.tv_nsec - start.tv_nsec) / 1e9;
 
     printf("Execution time is %f ns\n", time * 1e9);
+	
+	printf("Execution time of the kernelA layer 1 is %f ns\n", time1*1e9);
+	printf("Execution time of the kernelB layer 1 is %f ns\n", time2*1e9);
+	printf("Execution time of the kernelC layer 1 is %f ns\n", time3*1e9);
+	printf("Execution time of the kernelD layer 1 is %f ns\n", time4*1e9);
 }
 
 void NeuralNetwork()
@@ -1351,7 +1362,11 @@ void Execute_First_Layer(double *Layer2_Neurons_GPU)
     // Kernel Launch
     dim3 gridSizeA(32, 2, 2);
     dim3 blockSizeA(32, 32);
-
+	struct timespec start,stop;
+	if (clock_gettime(CLOCK_REALTIME, &start) == -1)
+    {
+        perror("clock gettime");
+    }
     executeFirstLayer_CONV3D_partA<<<gridSizeA, blockSizeA>>>(Layer1_Neurons_GPU,
                                                               Layer1_Weights_GPU,
                                                               Layer2_Neurons_GPU,
@@ -1359,10 +1374,21 @@ void Execute_First_Layer(double *Layer2_Neurons_GPU)
                                                               Layer1_StanDev_GPU,
                                                               Layer1_Gamma_GPU,
                                                               Layer1_Beta_GPU);
+															  
+	if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
+    {
+        perror("clock gettime");
+    }
+	time1 = (stop.tv_sec - start.tv_sec) + (double)(stop.tv_nsec - start.tv_nsec) / 1e9;
 
     dim3 gridSizeB(32, 2, 3);
     dim3 blockSizeB(32, 16);
-
+	
+	if (clock_gettime(CLOCK_REALTIME, &start) == -1)
+    {
+        perror("clock gettime");
+    }
+	
     executeFirstLayer_CONV3D_partB<<<gridSizeB, blockSizeB>>>(Layer1_Neurons_GPU,
                                                               Layer1_Weights_GPU,
                                                               Layer2_Neurons_GPU,
@@ -1370,10 +1396,21 @@ void Execute_First_Layer(double *Layer2_Neurons_GPU)
                                                               Layer1_StanDev_GPU,
                                                               Layer1_Gamma_GPU,
                                                               Layer1_Beta_GPU);
-
+	if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
+    {
+        perror("clock gettime");
+    }
+	
+	time2 = (stop.tv_sec - start.tv_sec) + (double)(stop.tv_nsec - start.tv_nsec) / 1e9;														  
+	
     dim3 gridSizeC(32, 3, 2);
     dim3 blockSizeC(16, 32);
-
+	
+	
+	if (clock_gettime(CLOCK_REALTIME, &start) == -1)
+    {
+        perror("clock gettime");
+    }
     executeFirstLayer_CONV3D_partC<<<gridSizeC, blockSizeC>>>(Layer1_Neurons_GPU,
                                                               Layer1_Weights_GPU,
                                                               Layer2_Neurons_GPU,
@@ -1382,9 +1419,18 @@ void Execute_First_Layer(double *Layer2_Neurons_GPU)
                                                               Layer1_Gamma_GPU,
                                                               Layer1_Beta_GPU);
 															  
-	
+	if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
+    {
+        perror("clock gettime");
+    }
+	time3 = (stop.tv_sec - start.tv_sec) + (double)(stop.tv_nsec - start.tv_nsec) / 1e9;
 	dim3 gridSizeD(32, 3, 3);
 	dim3 blockSizeD(16, 16);
+	
+	if (clock_gettime(CLOCK_REALTIME, &start) == -1)
+    {
+        perror("clock gettime");
+    }
 	executeFirstLayer_CONV3D_partD<<<gridSizeD, blockSizeD>>>(Layer1_Neurons_GPU,
                                                               Layer1_Weights_GPU,
                                                               Layer2_Neurons_GPU,
@@ -1392,7 +1438,11 @@ void Execute_First_Layer(double *Layer2_Neurons_GPU)
                                                               Layer1_StanDev_GPU,
                                                               Layer1_Gamma_GPU,
                                                               Layer1_Beta_GPU);
-
+	if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
+    {
+        perror("clock gettime");
+    }
+	time4 = (stop.tv_sec - start.tv_sec) + (double)(stop.tv_nsec - start.tv_nsec) / 1e9;
     cudaDeviceSynchronize();
 
     // First Layer GPU Memory Free
