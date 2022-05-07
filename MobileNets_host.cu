@@ -1349,7 +1349,7 @@ void Execute_First_Layer(double *Layer2_Neurons_GPU)
     free(Layer1_Beta_CPU);
 
     // Kernel Launch
-    dim3 gridSizeA(32, 3, 3);
+    dim3 gridSizeA(32, 2, 2);
     dim3 blockSizeA(32, 32);
 
     executeFirstLayer_CONV3D_partA<<<gridSizeA, blockSizeA>>>(Layer1_Neurons_GPU,
@@ -1360,8 +1360,8 @@ void Execute_First_Layer(double *Layer2_Neurons_GPU)
                                                               Layer1_Gamma_GPU,
                                                               Layer1_Beta_GPU);
 
-    dim3 gridSizeB(32, 7);
-    dim3 blockSizeB(16, 16);
+    dim3 gridSizeB(32, 2, 3);
+    dim3 blockSizeB(32, 16);
 
     executeFirstLayer_CONV3D_partB<<<gridSizeB, blockSizeB>>>(Layer1_Neurons_GPU,
                                                               Layer1_Weights_GPU,
@@ -1371,10 +1371,21 @@ void Execute_First_Layer(double *Layer2_Neurons_GPU)
                                                               Layer1_Gamma_GPU,
                                                               Layer1_Beta_GPU);
 
-    dim3 gridSizeC(32, 6);
-    dim3 blockSizeC(16, 16);
+    dim3 gridSizeC(32, 3, 2);
+    dim3 blockSizeC(16, 32);
 
     executeFirstLayer_CONV3D_partC<<<gridSizeC, blockSizeC>>>(Layer1_Neurons_GPU,
+                                                              Layer1_Weights_GPU,
+                                                              Layer2_Neurons_GPU,
+                                                              Layer1_Mean_GPU,
+                                                              Layer1_StanDev_GPU,
+                                                              Layer1_Gamma_GPU,
+                                                              Layer1_Beta_GPU);
+															  
+	
+	dim3 gridSizeD(32, 3, 3);
+	dim3 blockSizeD(16, 16);
+	executeFirstLayer_CONV3D_partD<<<gridSizeD, blockSizeD>>>(Layer1_Neurons_GPU,
                                                               Layer1_Weights_GPU,
                                                               Layer2_Neurons_GPU,
                                                               Layer1_Mean_GPU,
