@@ -128,7 +128,10 @@ double time1;
 double time2;
 double time3;
 double time4;
+double time5;
 
+
+double time_FifthLayer;
 // Function declarations
 void NeuralNetwork();
 void read_File(const char *weightFileName, double *Layer1_Weights_CPU);
@@ -439,6 +442,8 @@ int main()
 	printf("Execution time of the kernelB layer 1 is %f ns\n", time2*1e9);
 	printf("Execution time of the kernelC layer 1 is %f ns\n", time3*1e9);
 	printf("Execution time of the kernelD layer 1 is %f ns\n", time4*1e9);
+	printf("Execution time of the layer 3 with constant memory is %f ns\n", time5*1e9);
+	printf("Execution time of the layer 5 with constant memory and new memory layout is %f ns\n",time_FifthLayer*1e9);
 }
 
 void NeuralNetwork()
@@ -1379,7 +1384,7 @@ void Execute_First_Layer(double *Layer2_Neurons_GPU)
     {
         perror("clock gettime");
     }
-	time1 = (stop.tv_sec - start.tv_sec) + (double)(stop.tv_nsec - start.tv_nsec) / 1e9;
+	time1 = (stop.tv_sec - start.tv_sec) + (double)(stop.tv_nsec - start.tv_nsec) / (2*1e9);
 
     dim3 gridSizeB(32, 2, 3);
     dim3 blockSizeB(32, 16);
@@ -1561,21 +1566,28 @@ void Read_SecondLayer_Data(double *Layer2_Weights_CPU,
     read_File("data/SecondLayer/Second_Layer_Beta.txt", Layer2_Beta_CPU);
 }
 
+__constant__ double Weights[32*64];
 void Execute_Third_Layer(
     double *Layer3_Neurons_GPU,
     double *Layer4_Neurons_GPU)
 {
+	
     double *Layer3_Weights_CPU = (double *)malloc(sizeof(double) * THIRD_LAYER_WEIGHT_SIZE);
     double *Layer3_Mean_CPU = (double *)malloc(sizeof(double) * THIRD_LAYER_CHANNELS);
     double *Layer3_StanDev_CPU = (double *)malloc(sizeof(double) * THIRD_LAYER_CHANNELS);
     double *Layer3_Gamma_CPU = (double *)malloc(sizeof(double) * THIRD_LAYER_CHANNELS);
     double *Layer3_Beta_CPU = (double *)malloc(sizeof(double) * THIRD_LAYER_CHANNELS);
-
+	
+	
+	
+	
     Read_ThirdLayer_Data(Layer3_Weights_CPU,
                          Layer3_Mean_CPU,
                          Layer3_StanDev_CPU,
                          Layer3_Gamma_CPU,
                          Layer3_Beta_CPU);
+						 
+	
 
     double *Layer3_Weights_GPU,
         *Layer3_Mean_GPU,
@@ -1583,13 +1595,13 @@ void Execute_Third_Layer(
         *Layer3_Gamma_GPU,
         *Layer3_Beta_GPU;
 
-    cudaMalloc((void **)&Layer3_Weights_GPU, sizeof(double) * THIRD_LAYER_WEIGHT_SIZE);
+    
     cudaMalloc((void **)&Layer3_Mean_GPU, sizeof(double) * THIRD_LAYER_CHANNELS);
     cudaMalloc((void **)&Layer3_StanDev_GPU, sizeof(double) * THIRD_LAYER_CHANNELS);
     cudaMalloc((void **)&Layer3_Gamma_GPU, sizeof(double) * THIRD_LAYER_CHANNELS);
     cudaMalloc((void **)&Layer3_Beta_GPU, sizeof(double) * THIRD_LAYER_CHANNELS);
 
-    cudaMemcpy(Layer3_Weights_GPU, Layer3_Weights_CPU, sizeof(double) * THIRD_LAYER_WEIGHT_SIZE, cudaMemcpyHostToDevice);
+    cudaMemcpy(Weights, Layer3_Weights_CPU, sizeof(double) * THIRD_LAYER_WEIGHT_SIZE, cudaMemcpyHostToDevice);
     cudaMemcpy(Layer3_Mean_GPU, Layer3_Mean_CPU, sizeof(double) * THIRD_LAYER_CHANNELS, cudaMemcpyHostToDevice);
     cudaMemcpy(Layer3_StanDev_GPU, Layer3_StanDev_CPU, sizeof(double) * THIRD_LAYER_CHANNELS, cudaMemcpyHostToDevice);
     cudaMemcpy(Layer3_Gamma_GPU, Layer3_Gamma_CPU, sizeof(double) * THIRD_LAYER_CHANNELS, cudaMemcpyHostToDevice);
@@ -1600,12 +1612,19 @@ void Execute_Third_Layer(
     free(Layer3_StanDev_CPU);
     free(Layer3_Gamma_CPU);
     free(Layer3_Beta_CPU);
-
+	
+	
+	
     // Execution of the Third Layer
     dim3 gridSizeThirdLayerA(64, 3, 3);
     dim3 blockSizeThirdLayerA(32, 32);
+	struct timespec start, stop;
+	if (clock_gettime(CLOCK_REALTIME, &start) == -1)
+    {
+        perror("clock gettime");
+    }
     executeThirdLayer_PSC_partA<<<gridSizeThirdLayerA, blockSizeThirdLayerA>>>(Layer3_Neurons_GPU,
-                                                                               Layer3_Weights_GPU,
+                                                                               Weights,
                                                                                Layer4_Neurons_GPU,
                                                                                Layer3_Mean_GPU,
                                                                                Layer3_StanDev_GPU,
@@ -1615,7 +1634,7 @@ void Execute_Third_Layer(
     dim3 gridSizeThirdLayerB(64, 7);
     dim3 blockSizeThirdLayerB(16, 16);
     executeThirdLayer_PSC_partB<<<gridSizeThirdLayerB, blockSizeThirdLayerB>>>(Layer3_Neurons_GPU,
-                                                                               Layer3_Weights_GPU,
+                                                                               Weights,
                                                                                Layer4_Neurons_GPU,
                                                                                Layer3_Mean_GPU,
                                                                                Layer3_StanDev_GPU,
@@ -1625,16 +1644,22 @@ void Execute_Third_Layer(
     dim3 gridSizeThirdLayerC(64, 6);
     dim3 blockSizeThirdLayerC(16, 16);
     executeThirdLayer_PSC_partC<<<gridSizeThirdLayerC, blockSizeThirdLayerC>>>(Layer3_Neurons_GPU,
-                                                                               Layer3_Weights_GPU,
+                                                                               Weights,
                                                                                Layer4_Neurons_GPU,
                                                                                Layer3_Mean_GPU,
                                                                                Layer3_StanDev_GPU,
                                                                                Layer3_Gamma_GPU,
                                                                                Layer3_Beta_GPU);
-
+	
+	
+	if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
+    {
+        perror("clock gettime");
+    }
+	time5 = (stop.tv_sec - start.tv_sec) + (double)(stop.tv_nsec - start.tv_nsec) / 1e9;
     cudaDeviceSynchronize();
 
-    cudaFree(Layer3_Weights_GPU);
+    
     cudaFree(Layer3_Mean_GPU);
     cudaFree(Layer3_StanDev_GPU);
     cudaFree(Layer3_Gamma_GPU);
@@ -1751,6 +1776,9 @@ void Read_FourthLayer_Data(double *Layer4_Weights_CPU,
     read_File("data/FourthLayer/Fourth_Layer_Beta.txt", Layer4_Beta_CPU);
 }
 
+__constant__ double Weights_Five_B[64*32];
+__constant__ double Weights_Five_C[64*32];
+__constant__ double Weights_Five_D[64*32];
 void Execute_Fifth_Layer(
     double *Layer5_Neurons_GPU,
     double *Layer6_Neurons_GPU)
@@ -1773,13 +1801,16 @@ void Execute_Fifth_Layer(
         *Layer5_Gamma_GPU,
         *Layer5_Beta_GPU;
 
-    cudaMalloc((void **)&Layer5_Weights_GPU, sizeof(double) * FIFTH_LAYER_WEIGHT_SIZE);
+    
     cudaMalloc((void **)&Layer5_Mean_GPU, sizeof(double) * FIFTH_LAYER_CHANNELS);
     cudaMalloc((void **)&Layer5_StanDev_GPU, sizeof(double) * FIFTH_LAYER_CHANNELS);
     cudaMalloc((void **)&Layer5_Gamma_GPU, sizeof(double) * FIFTH_LAYER_CHANNELS);
     cudaMalloc((void **)&Layer5_Beta_GPU, sizeof(double) * FIFTH_LAYER_CHANNELS);
 
-    cudaMemcpy(Layer5_Weights_GPU, Layer5_Weights_CPU, sizeof(double) * FIFTH_LAYER_WEIGHT_SIZE, cudaMemcpyHostToDevice);
+    cudaMemcpy(Weights_Five_B, Layer5_Weights_CPU, sizeof(double) * THIRD_LAYER_WEIGHT_SIZE, cudaMemcpyHostToDevice);
+	cudaMemcpy(Weights_Five_C, Layer5_Weights_CPU, sizeof(double) * THIRD_LAYER_WEIGHT_SIZE, cudaMemcpyHostToDevice);
+	cudaMemcpy(Weights_Five_D, Layer5_Weights_CPU, sizeof(double) * THIRD_LAYER_WEIGHT_SIZE, cudaMemcpyHostToDevice);
+	cudaMemcpy(Weights, Layer5_Weights_CPU, sizeof(double) * THIRD_LAYER_WEIGHT_SIZE, cudaMemcpyHostToDevice);
     cudaMemcpy(Layer5_Mean_GPU, Layer5_Mean_CPU, sizeof(double) * FIFTH_LAYER_CHANNELS, cudaMemcpyHostToDevice);
     cudaMemcpy(Layer5_StanDev_GPU, Layer5_StanDev_CPU, sizeof(double) * FIFTH_LAYER_CHANNELS, cudaMemcpyHostToDevice);
     cudaMemcpy(Layer5_Gamma_GPU, Layer5_Gamma_CPU, sizeof(double) * FIFTH_LAYER_CHANNELS, cudaMemcpyHostToDevice);
@@ -1790,45 +1821,58 @@ void Execute_Fifth_Layer(
     free(Layer5_StanDev_CPU);
     free(Layer5_Gamma_CPU);
     free(Layer5_Beta_CPU);
-
-    dim3 gridSizeFifthLayer(128);
-    dim3 blockSizeFifthLayerA(32, 32);
+	
+	
+	struct timespec start, stop;
+	if (clock_gettime(CLOCK_REALTIME, &start) == -1)
+    {
+        perror("clock gettime");
+    }
+	
+    dim3 gridSizeFifthLayer(32);
+    dim3 blockSizeFifthLayerA(56, 56);
     executeFifthLayer_PSC_partA<<<gridSizeFifthLayer, blockSizeFifthLayerA>>>(Layer5_Neurons_GPU,
-                                                                              Layer5_Weights_GPU,
+                                                                              Weights,
                                                                               Layer6_Neurons_GPU,
                                                                               Layer5_Mean_GPU,
                                                                               Layer5_StanDev_GPU,
                                                                               Layer5_Gamma_GPU,
                                                                               Layer5_Beta_GPU);
 
-    dim3 blockSizeFifthLayerB(32, 24);
+    dim3 blockSizeFifthLayerB(56, 56);
     executeFifthLayer_PSC_partB<<<gridSizeFifthLayer, blockSizeFifthLayerB>>>(Layer5_Neurons_GPU,
-                                                                              Layer5_Weights_GPU,
+                                                                              Weights,
                                                                               Layer6_Neurons_GPU,
                                                                               Layer5_Mean_GPU,
                                                                               Layer5_StanDev_GPU,
                                                                               Layer5_Gamma_GPU,
                                                                               Layer5_Beta_GPU);
 
-    dim3 blockSizeFifthLayerC(24, 32);
+    dim3 blockSizeFifthLayerC(56, 56);
     executeFifthLayer_PSC_partC<<<gridSizeFifthLayer, blockSizeFifthLayerC>>>(Layer5_Neurons_GPU,
-                                                                              Layer5_Weights_GPU,
+                                                                              Weights,
                                                                               Layer6_Neurons_GPU,
                                                                               Layer5_Mean_GPU,
                                                                               Layer5_StanDev_GPU,
                                                                               Layer5_Gamma_GPU,
                                                                               Layer5_Beta_GPU);
 
-    dim3 blockSizeFifthLayerD(24, 24);
+    dim3 blockSizeFifthLayerD(56, 56);
     executeFifthLayer_PSC_partD<<<gridSizeFifthLayer, blockSizeFifthLayerD>>>(Layer5_Neurons_GPU,
-                                                                              Layer5_Weights_GPU,
+                                                                              Weights,
                                                                               Layer6_Neurons_GPU,
                                                                               Layer5_Mean_GPU,
                                                                               Layer5_StanDev_GPU,
                                                                               Layer5_Gamma_GPU,
                                                                               Layer5_Beta_GPU);
 
-    cudaFree(Layer5_Weights_GPU);
+    
+	if (clock_gettime(CLOCK_REALTIME, &stop) == -1)
+    {
+        perror("clock gettime");
+    }
+	time_FifthLayer = (stop.tv_sec - start.tv_sec) + (double)(stop.tv_nsec - start.tv_nsec) / 1e9;
+	
     cudaFree(Layer5_Mean_GPU);
     cudaFree(Layer5_StanDev_GPU);
     cudaFree(Layer5_Gamma_GPU);
@@ -2156,6 +2200,8 @@ void Execute_Ninth_Layer(
 
     dim3 gridSizeNinthLayer(256);
     dim3 blockSizeNinth(28, 28);
+	
+	
     executeNinthLayer_PSC<<<gridSizeNinthLayer, blockSizeNinth>>>(Layer9_Neurons_GPU,
                                                                   Layer9_Weights_GPU,
                                                                   Layer10_Neurons_GPU,
